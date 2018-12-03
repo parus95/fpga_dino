@@ -1,0 +1,33 @@
+{
+  "name": "dino",
+  "version": "1.0.0",
+  "description": "Chrome's dinosaur game, except it's in Electron and supports Discord Rich Presence.",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "*"
+  },
+  "scripts": {
+    "start": "npm i && electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CuriosityDev/Dino.git"
+  },
+  "keywords": [
+    "discordapp",
+    "discord",
+    "richpresence",
+    "rpc",
+    "dino",
+    "dinosaur",
+    "game",
+    "electron"
+  ],
+  "author": "Hexexpeck",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CuriosityDev/Dino/issues"
+  },
+  "homepage": "https://github.com/CuriosityDev/Dino#readme"
+}
