@@ -10,8 +10,9 @@ function createWindow()
     width: 1000,
     height: 500,
     resizable: false,
-    titleBarStyle: 'hidden'
   });
+  //mainWindow.webContents.openDevTools();
+  mainWindow.setMenu(null);
 
   mainWindow.loadURL(url.format({
     pathname: path.join(__dirname, "index.html"),

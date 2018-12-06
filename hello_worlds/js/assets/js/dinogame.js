@@ -2712,6 +2712,23 @@ function onDocumentLoad() {
 
 document.addEventListener('DOMContentLoaded', onDocumentLoad);
 
+let interval;
+
 function superJump() {
-	window['Runner'].instance_.jump();
+    if (interval){
+        clearInterval(interval);
+        interval = undefined;
+    }
+    const inst = window['Runner'].instance_;
+    
+    if (inst.crashed){
+        inst.restart();
+    } else {
+        inst.jump();
+    }
+}
+
+function endJump(timeout) {
+    const inst = window['Runner'].instance_;
+    interval = setTimeout(()=>inst.endJump(), timeout);
 }
