@@ -27,7 +27,7 @@
 #
 # 3. The following remote source files that were added to the original project:-
 #
-#    "/home/parus/git/fpga_dino/hello_worlds/fpga/soc/soc.srcs/sources_1/imports/picosoc/spimemio.v"
+#    "/home/parus/git/fpga_dino/hello_worlds/fpga/soc/soc.srcs/sources_1/imports/picorv32/picosoc/spimemio.v"
 #    "/home/parus/git/fpga_dino/hello_worlds/fpga/soc/soc.srcs/sources_1/imports/picorv32/picosoc/simpleuart.v"
 #    "/home/parus/git/fpga_dino/hello_worlds/fpga/soc/soc.srcs/sources_1/imports/picorv32/picosoc/picosoc.v"
 #    "/home/parus/git/fpga_dino/hello_worlds/fpga/soc/soc.srcs/sources_1/imports/picorv32/picorv32.v"
@@ -115,7 +115,7 @@ if {[string equal [get_filesets -quiet sources_1] ""]} {
 # Set 'sources_1' fileset object
 set obj [get_filesets sources_1]
 set files [list \
- "[file normalize "$origin_dir/soc.srcs/sources_1/imports/picosoc/spimemio.v"]"\
+ "[file normalize "$origin_dir/soc.srcs/sources_1/imports/picorv32/picosoc/spimemio.v"]"\
  "[file normalize "$origin_dir/soc.srcs/sources_1/imports/picorv32/picosoc/simpleuart.v"]"\
  "[file normalize "$origin_dir/soc.srcs/sources_1/imports/picorv32/picosoc/picosoc.v"]"\
  "[file normalize "$origin_dir/soc.srcs/sources_1/imports/picorv32/picorv32.v"]"\

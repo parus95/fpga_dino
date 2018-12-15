@@ -1,6 +1,1 @@
-/soc.cache
-/soc.hw
-/soc.ip_user_files
-/soc.runs
-/soc.xpr
-
+/soc/*
