@@ -1,0 +1,10 @@
+*.bin
+*.hex
+/firmware.elf
+/firmware.ihex
+/firmware.map
+/firmware.mcs
+/firmware.prm
+*.o
+*.vcd
+
