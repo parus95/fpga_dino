@@ -1,2 +1,9 @@
 *.log
 *.jou
+/program
+bitstream.bit
+firmware.bin
+/firmware.mcs
+/firmware.prm
+
+

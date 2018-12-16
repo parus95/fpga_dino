@@ -1,5 +1,4 @@
-
-RISCV_GNU_TOOLCHAIN_INSTALL_PREFIX = /opt/riscv32
+include ../../Makefile.in
 
 SHELL = bash
 FIRMWARE_OBJS = start.o main.o print.o
@@ -8,8 +7,8 @@ GCC_WARNS += -Wredundant-decls -Wstrict-prototypes -Wmissing-prototypes -pedanti
 TOOLCHAIN_PREFIX = $(RISCV_GNU_TOOLCHAIN_INSTALL_PREFIX)i/bin/riscv32-unknown-elf-
 COMPRESSED_ISA = C
 
-firmware.mcs: firmware.bin
-	/opt/Xilinx/Vivado/2015.3/bin/vivado -mode batch -source ./tcl/convert.tcl -source ./tcl/connect.tcl -source ./tcl/program_sw.tcl  -source ./tcl/program_hw.tcl
+#firmware.mcs: firmware.bin
+#	/opt/Xilinx/Vivado/2015.3/bin/vivado -mode batch -source ./tcl/convert.tcl -source ./tcl/connect.tcl -source ./tcl/program_sw.tcl  -source ./tcl/program_hw.tcl
 
 firmware.hex: firmware.bin makehex.py
 	python3 makehex.py $< 16384 > $@
