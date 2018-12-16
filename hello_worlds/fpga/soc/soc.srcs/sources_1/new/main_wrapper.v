@@ -33,6 +33,11 @@ module main_wrapper(
     inout tri QSPI_DQ1,
     inout tri QSPI_DQ2,
     inout tri QSPI_DQ3,
+    
+    output wire MIC_nCS,
+    output wire MIC_MOSI,
+    output wire MIC_CLK,    
+    input wire MIC_MISO,
 
     output wire USER_LED1,
     output wire USER_LED2,
@@ -41,9 +46,10 @@ module main_wrapper(
     output wire USER_LED5,
     output wire USER_LED6,
     output wire USER_LED7,
-    output wire USER_LED8,
+    output wire USER_LED8
     
-    output wire J11_1,
+    /*
+    ,output wire J11_1,
     output wire J11_2,
     output wire J11_3,
     output wire J11_4,
@@ -51,16 +57,8 @@ module main_wrapper(
     output wire J11_8,
     output wire J11_9,
     output wire J11_10
+    */
 );
-
-assign J11_1 = USB_UART_TXD;
-assign J11_2 = NetR32_1;
-assign J11_3 = QSPI_CSn;
-assign J11_4 = QSPI_DQ0;
-assign J11_7 = QSPI_DQ1;
-assign J11_8 = QSPI_DQ2;
-assign J11_9 = QSPI_DQ3;
-assign J11_10 = 1'b0;
 
 
 reg[7:0] leds = 0;
@@ -89,7 +87,7 @@ wire clk;
 
 clk_wiz_0 pll(.clk_in_200(SYS_CLK_I), .clk_out_10(clk), .reset(PB_RST));
 
-wire rst;
+wire rst ;
 
 rst_spike spike(
     .clk(clk),
@@ -109,11 +107,7 @@ picosoc soc(
 	.iomem_addr(iomem_addr),
 	.iomem_wdata(iomem_wdata),
 	.iomem_rdata(iomem_rdata),
-/*
-	input  irq_5,
-	input  irq_6,
-	input  irq_7,
-*/
+
 	.ser_tx(USB_UART_TXD),
 	.ser_rx(USB_UART_RXD),
 
@@ -141,17 +135,99 @@ assign
     QSPI_DQ1 = flash_io_oe[1] ? flash_io_do[1] : 1'bz,
     QSPI_DQ2 = flash_io_oe[2] ? flash_io_do[2] : 1'bz,
     QSPI_DQ3 = flash_io_oe[3] ? flash_io_do[3] : 1'bz;
+    
+reg corr_data_avail = 0;
+reg dec_data_avail = 0;
 
 always @(posedge clk) begin
-    if (iomem_valid && !iomem_ready && iomem_addr == 32'h0300_0000) begin
-        if (iomem_wstrb[0]) leds <= iomem_wdata[7:0];
+    if (correlatedStrobe) corr_data_avail <= 1;
+    if (decimatedStrobe) dec_data_avail <= 1;
 
-        iomem_rdata <= {24'h000000, leds};
-        iomem_ready <= 1'b1;
+    if (iomem_valid && !iomem_ready) begin
+        if (iomem_addr == 32'h0300_0000) begin
+            if (iomem_wstrb[0]) leds <= iomem_wdata[7:0];
+        
+            iomem_rdata <= {24'h000000, leds};
+            iomem_ready <= 1'b1;
+        end else if (iomem_addr == 32'h0300_0004) begin    
+            iomem_rdata <= {30'h0, dec_data_avail, corr_data_avail};
+            iomem_ready <= 1'b1;
+        end else if (iomem_addr == 32'h0300_0008) begin
+            corr_data_avail <= 0;
+            iomem_rdata <= {24'h0, correlatedData};
+            iomem_ready <= 1'b1;
+        end else if (iomem_addr == 32'h0300_000C) begin
+            if (iomem_wstrb[0]) correlatorConf[7:0] <= iomem_wdata[7:0];
+            if (iomem_wstrb[1]) correlatorConf[15:8] <= iomem_wdata[15:8];
+            if (iomem_wstrb[2]) correlatorConf[23:16] <= iomem_wdata[23:16];
+            if (iomem_wstrb[3]) correlatorConf[31:24] <= iomem_wdata[31:24];
+
+            iomem_rdata <= correlatorConf[31:0];
+            iomem_ready <= 1'b1;
+        end else if (iomem_addr == 32'h0300_0010) begin
+            if (iomem_wstrb[0]) correlatorConf[39:32] <= iomem_wdata[7:0];
+            if (iomem_wstrb[1]) correlatorConf[47:40] <= iomem_wdata[15:8];
+            if (iomem_wstrb[2]) correlatorConf[49:48] <= iomem_wdata[17:16];
+            //if (iomem_wstrb[3]) correlatorConf[63:56] <= iomem_wdata[31:24];
+
+            iomem_rdata <= {14'h0, correlatorConf[49:32]};
+            iomem_ready <= 1'b1;
+        end else if (iomem_addr == 32'h0300_0014) begin
+            dec_data_avail <= 0;
+            iomem_rdata <= {24'h0, decimatedData};
+            iomem_ready <= 1'b1;
+        end  else begin
+            iomem_rdata <= 32'hXXXXXXXX;
+            iomem_ready <= 1'b0;        
+        end
     end else begin
         iomem_rdata <= 32'hXXXXXXXX;
         iomem_ready <= 1'b0;
     end
 end
 
+wire [15:0] micReaderData;
+wire micReaderDataStrobe;
+
+assign MIC_MOSI = 1'b0;
+assign MIC_CLK = clk;
+mic_reader reader(
+    .clk(clk),
+    .miso(MIC_MISO),
+    .nCs(MIC_nCS),
+    .outData(micReaderData),
+    .outStrobe(micReaderDataStrobe)
+);
+
+wire signed [7:0]
+    micDataSigned = micReaderData[11:4] - 8'd128;
+
+
+wire signed [7:0] decimatedData;
+wire decimatedStrobe;
+
+mic_data_decimator decimator(
+    .clk(clk),
+    
+    .data_in(micDataSigned),
+    .data_in_strobe(micReaderDataStrobe),
+    
+    .data_out(decimatedData),
+    .data_out_strobe(decimatedStrobe)
+);
+
+
+//reg[49:0] correlatorConf= 50'b11100010110100100011110001110000111100011101110001;
+reg[49:0] correlatorConf= 50'h0;
+wire signed [7:0] correlatedData;
+wire correlatedStrobe;
+xcorr cross_correlator(
+    .clk(clk),
+    .data_in_avail(decimatedStrobe),
+    .data_in(decimatedData),
+    .data_out_ready(correlatedStrobe),
+    .data_out(correlatedData),
+
+    .conf(correlatorConf)
+);
 endmodule

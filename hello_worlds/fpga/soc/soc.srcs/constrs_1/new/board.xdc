@@ -171,7 +171,10 @@ set_property PACKAGE_PIN T2 [get_ports PB_RST]
 # ----------------------------------------------------------------------------
 # Pmod4 - Bank 35
 # ----------------------------------------------------------------------------
-
+set_property PACKAGE_PIN G5 [get_ports MIC_nCS]
+set_property PACKAGE_PIN G4 [get_ports MIC_MOSI]
+set_property PACKAGE_PIN G2 [get_ports MIC_MISO]
+set_property PACKAGE_PIN G1 [get_ports MIC_CLK]
 
 # ----------------------------------------------------------------------------
 # Pmod5 - Bank 35

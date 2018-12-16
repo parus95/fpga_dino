@@ -24,20 +24,6 @@
 #    (Please see the '$orig_proj_dir' and '$origin_dir' variable setting below at the start of the script)
 #
 #    <none>
-#
-# 3. The following remote source files that were added to the original project:-
-#
-#    "/home/parus/git/fpga_dino/hello_worlds/fpga/soc/soc.srcs/sources_1/imports/picorv32/picosoc/spimemio.v"
-#    "/home/parus/git/fpga_dino/hello_worlds/fpga/soc/soc.srcs/sources_1/imports/picorv32/picosoc/simpleuart.v"
-#    "/home/parus/git/fpga_dino/hello_worlds/fpga/soc/soc.srcs/sources_1/imports/picorv32/picosoc/picosoc.v"
-#    "/home/parus/git/fpga_dino/hello_worlds/fpga/soc/soc.srcs/sources_1/imports/picorv32/picorv32.v"
-#    "/home/parus/git/fpga_dino/hello_worlds/fpga/soc/soc.srcs/sources_1/new/main_wrapper.v"
-#    "/home/parus/git/fpga_dino/hello_worlds/fpga/soc/soc.srcs/sources_1/new/rst_spike.v"
-#    "/home/parus/git/fpga_dino/hello_worlds/fpga/soc/soc.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0.xci"
-#    "/home/parus/git/fpga_dino/hello_worlds/fpga/soc/soc.srcs/constrs_1/imports/ledblink/7A50T_Master_XDC_PCB_Rev_A_v1_0.xdc"
-#    "/home/parus/git/fpga_dino/hello_worlds/fpga/soc/soc.srcs/constrs_1/new/constraints2.xdc"
-#
-#*****************************************************************************************
 
 # Set the reference directory for source file relative paths (by default the value is script directory path)
 set origin_dir "."
@@ -121,6 +107,9 @@ set files [list \
  "[file normalize "$origin_dir/soc.srcs/sources_1/imports/picorv32/picorv32.v"]"\
  "[file normalize "$origin_dir/soc.srcs/sources_1/new/main_wrapper.v"]"\
  "[file normalize "$origin_dir/soc.srcs/sources_1/new/rst_spike.v"]"\
+ "[file normalize "$origin_dir/soc.srcs/sources_1/new/mic_data_decimator.v"]"\
+ "[file normalize "$origin_dir/soc.srcs/sources_1/new/mic_reader.v"]"\
+ "[file normalize "$origin_dir/soc.srcs/sources_1/new/xcorr.v"]"\
 ]
 add_files -norecurse -fileset $obj $files
 
@@ -156,24 +145,24 @@ if {[string equal [get_filesets -quiet constrs_1] ""]} {
 set obj [get_filesets constrs_1]
 
 # Add/Import constrs file and set constrs file properties
-set file "[file normalize "$origin_dir/soc.srcs/constrs_1/imports/ledblink/7A50T_Master_XDC_PCB_Rev_A_v1_0.xdc"]"
+set file "[file normalize "$origin_dir/soc.srcs/constrs_1/new/board.xdc"]"
 set file_added [add_files -norecurse -fileset $obj $file]
-set file "$origin_dir/soc.srcs/constrs_1/imports/ledblink/7A50T_Master_XDC_PCB_Rev_A_v1_0.xdc"
+set file "$origin_dir/soc.srcs/constrs_1/new/board.xdc"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets constrs_1] [list "*$file"]]
 set_property "file_type" "XDC" $file_obj
 
 # Add/Import constrs file and set constrs file properties
-set file "[file normalize "$origin_dir/soc.srcs/constrs_1/new/constraints2.xdc"]"
+set file "[file normalize "$origin_dir/soc.srcs/constrs_1/new/clock.xdc"]"
 set file_added [add_files -norecurse -fileset $obj $file]
-set file "$origin_dir/soc.srcs/constrs_1/new/constraints2.xdc"
+set file "$origin_dir/soc.srcs/constrs_1/new/clock.xdc"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets constrs_1] [list "*$file"]]
 set_property "file_type" "XDC" $file_obj
 
 # Set 'constrs_1' fileset properties
 set obj [get_filesets constrs_1]
-set_property "target_constrs_file" "$orig_proj_dir/soc.srcs/constrs_1/new/constraints2.xdc" $obj
+set_property "target_constrs_file" "$orig_proj_dir/soc.srcs/constrs_1/new/clock.xdc" $obj
 
 # Create 'sim_1' fileset (if not found)
 if {[string equal [get_filesets -quiet sim_1] ""]} {
