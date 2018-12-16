@@ -1,6 +1,13 @@
 const serialport = require('serialport')
 
 let nonlinearFilterValue = 0;
+let threshold = 127;
+setInterval(()=>{
+    const trackbar = document.getElementById('threshold');
+    if (trackbar){
+        threshold = trackbar.value;
+    }
+}, 1000);
 
 serialport.list((err, list)=>{
     const portInfo = list.find(x=>x.pnpId && x.pnpId.startsWith("usb-Silicon_Labs_CP2104_USB_to_UART_Bridge_Controller"));
@@ -20,13 +27,10 @@ serialport.list((err, list)=>{
 
             if (prev > v + 5){
                 endJump(v / 128 * 200);
-            } else if (v > 30){
+            } else if (v > threshold){
                 superJump();
             }
         });
-        
-        abs.filter(x=>x>50)
-            .forEach(superJump);
     });
     
 });
