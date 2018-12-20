@@ -27,8 +27,7 @@ module mic_reader (
     assign nCs = ~active;
     
     reg [15:0] shr;
-    reg outStrobe;
-
+ 
  
     always @(posedge clk) begin
         if (active)
